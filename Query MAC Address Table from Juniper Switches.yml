@@ -7,7 +7,7 @@
     
   tasks:
     - name: Get MAC address table
-      juniper.device.junos_command:
+      junipernetworks.junos.junos_command:
         commands:
           - "show ethernet-switching table"
       register: mac_table_result
@@ -29,4 +29,3 @@
           {% else %}
           No matching MAC address found
           {% endif %}
-      when: found_entries is defined

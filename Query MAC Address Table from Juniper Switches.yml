@@ -7,8 +7,7 @@
     
   tasks:
     - name: Get MAC address table
-      ansible.netcommon.cli_command:
-        command: "show ethernet-switching table"
+      raw: "show ethernet-switching table"
       register: mac_table_result
       
     - name: Filter MAC results

@@ -7,23 +7,22 @@
     
   tasks:
     - name: Get MAC address table
-      junipernetworks.junos.junos_command:
-        commands:
-          - "show ethernet-switching table"
+      ansible.netcommon.cli_command:
+        command: "show ethernet-switching table"
       register: mac_table_result
       
-    - name: Parse MAC table for target MAC
+    - name: Filter MAC results
       set_fact:
-        found_entries: "{{ mac_table_result.stdout[0] | regex_findall('.*' + target_mac + '.*') }}"
+        filtered_output: "{{ mac_table_result.stdout | regex_findall('.*' + target_mac + '.*') }}"
       
     - name: Display results
       debug:
         msg: |
           Device: {{ inventory_hostname }}
           MAC Address: {{ target_mac }}
-          {% if found_entries %}
+          {% if filtered_output %}
           Found entries:
-          {% for entry in found_entries %}
+          {% for entry in filtered_output %}
           {{ entry }}
           {% endfor %}
           {% else %}

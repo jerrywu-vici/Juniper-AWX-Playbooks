@@ -1,0 +1,32 @@
+---
+- name: Query MAC Address Table from Juniper Switches
+  hosts: juniper_switches
+  gather_facts: no
+  vars:
+    target_mac: "{{ mac_address | upper }}"
+    
+  tasks:
+    - name: Get MAC address table
+      juniper.device.junos_command:
+        commands:
+          - "show ethernet-switching table"
+      register: mac_table_result
+      
+    - name: Parse MAC table for target MAC
+      set_fact:
+        found_entries: "{{ mac_table_result.stdout[0] | regex_findall('.*' + target_mac + '.*') }}"
+      
+    - name: Display results
+      debug:
+        msg: |
+          Device: {{ inventory_hostname }}
+          MAC Address: {{ target_mac }}
+          {% if found_entries %}
+          Found entries:
+          {% for entry in found_entries %}
+          {{ entry }}
+          {% endfor %}
+          {% else %}
+          No matching MAC address found
+          {% endif %}
+      when: found_entries is defined
